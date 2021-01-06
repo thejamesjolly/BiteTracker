@@ -28,7 +28,7 @@ FILE	*fpt;
 char	filename[320];
 int	i,j,k;
 float	zero[3],total;
-float	yaw,pitch,roll;
+//float	yaw,pitch,roll;
 float	*Data[7],*SmoothedData[7];
 int	TotalData;
 int	GTBiteIndex[MAX_BITES];		/* data index of GT bite */
@@ -198,14 +198,22 @@ for (i=0; i<TotalWindows; i++)
 		FloatWindowBites[i]);
   else
     {
-    //printf("%d",WindowBites[i]);	/* class is #bites */
-    printf("%.3lf",FloatWindowBites[i]);	/* class is #bites */
+    printf("%d",WindowBites[i]);	/* class is #bites */
+    //printf("%.3lf",FloatWindowBites[i]);	/* class is #bites */
     for (k=WindowIndex[i]; k<WindowIndex[i]+CUT; k++)
       {
-      for (j=0; j<6; j++)
-        //printf("\t%.3f",SmoothedData[j][k]);
-        printf("");
+      if ((k < 0) || (k >= TotalData)) {
+        for (j=0; j<6; j++) {
+          // pad with zeros if start or end out of data
+          printf("\t0.000");
+        }
       }
+      else {
+        for (j=0; j<6; j++) {
+          printf("\t%.3f",SmoothedData[j][k]);
+        }
+      }
+      
     printf("\n");
     }
   }
@@ -234,11 +242,5 @@ for (i=0; i<7; i++)
 
 }
 
-
-
-
-
-
-
-
+}
 

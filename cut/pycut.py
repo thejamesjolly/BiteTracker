@@ -143,6 +143,7 @@ if (PRINT == 1):
             printf(windowIndex[i], windowIndex[i]+CUT, windowBites[i])
         else:
             if (int(windowBites[i]) > -1):
+                print("{d}".format(windowBites[i]), end='')  # class is number of bites
                 print("{:.3f}".format(float(windowBites[i])), end='')  # class is number of bites
                 for k in range(int(windowIndex[i]), int(windowIndex[i] + CUT)):
                     if k < 0 or k >= totalData:
