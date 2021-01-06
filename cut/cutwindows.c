@@ -188,10 +188,6 @@ for (i=start; i<end; i+=15) // CUT)
 	/* print out cut bite data */
 
 
-
-
-if TRUE:
-
 if (1)
 for (i=0; i<TotalWindows; i++)
   {
