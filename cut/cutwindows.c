@@ -18,7 +18,7 @@
 
 #define	MAX_DATA	54000	/* one hour at 15 Hz */
 #define	MAX_BITES	500
-#define	CUT		(15*30)	/* 30 sec at 15 Hz */
+//#define	CUT		(15*30)	/* 30 sec at 15 Hz */ //passed as input argument
 #define	MAX_WINDOWS	20000
 
 int main(int argc, char *argv[])
@@ -43,12 +43,15 @@ float	FloatWindowBites[MAX_WINDOWS];
 int	BiteLength,BiteStart,BiteEnd;
 int	start,end;
 
-if (argc != 2)
+if (argc != 4)
   {
-  printf("Usage:  cutwindows [filename.txt]\n");
-  printf("        assumes there is a gt_union.txt in same folder\n");
+  printf("Usage:  cutwindows [CUT] [STRIDE] [filename.txt]\n");
+  printf("        assumes there is a gt_union.txt in same folder as filename\n");
   exit(0);
   }
+
+int CUT = atoi(argv[1]);
+int STRIDE = atoi(argv[2]);
 
 for (i=0; i<7; i++)
   {
@@ -56,7 +59,7 @@ for (i=0; i<7; i++)
   SmoothedData[i]=(float *)calloc(MAX_DATA,sizeof(float));
   }
 
-if ((fpt=fopen(argv[1],"rb")) == NULL)
+if ((fpt=fopen(argv[3],"r")) == NULL)
   {
   printf("Unable to open %s for reading\n",argv[1]);
   exit(0);
@@ -122,7 +125,7 @@ for (i=7; i<TotalData-7; i++)
   } 
 
 	/* load GT bites */
-strcpy(filename,argv[1]);
+strcpy(filename,argv[3]);
 j=strlen(filename)-1;
 while (j > 0  &&  filename[j] != '/'  &&  filename[j] != '\\')
   j--;
@@ -147,15 +150,15 @@ while (1)
 fclose(fpt);
 
 	/* cut windows 10 sec prior to first bite, to 10 sec after last bite */
-start=GTBiteIndex[0]-(30*15);
+start=GTBiteIndex[0]-CUT;
 if (start < 0)
   start=0;
-end=GTBiteIndex[TotalGTBites-1]+(30*15);
+end=GTBiteIndex[TotalGTBites-1]+CUT;
 if (end >= TotalData)
   end=TotalData-1;
 
 TotalWindows=0;
-for (i=start; i<end; i+=15) // CUT)
+for (i=start; i<end; i+=STRIDE) // CUT)
   {
   if (i+CUT > end)
     break;	/* not a full window */
@@ -217,6 +220,7 @@ for (i=0; i<TotalWindows; i++)
     printf("\n");
     }
   }
+}
 
 	/* write out binary data */
 if (0)
@@ -242,5 +246,5 @@ for (i=0; i<7; i++)
 
 }
 
-}
+
 

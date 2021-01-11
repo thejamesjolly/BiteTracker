@@ -25,6 +25,7 @@ DATA_FIELDS = 7
 TOTAL_DATA_FIELDS = 17
 DEBUG = 0  # debug modes 1 and 2 for alternate prints
 PRINT = 1  # print data
+PRINT_INT = True # determines wheter classifier label is an int or float
 SAMPLES_PER_BITE = 7  # number of samples used per bite
 
 # allocate space for everything
@@ -140,11 +141,14 @@ if (DEBUG == 1):
 if (PRINT == 1):
     for i in range(0, totalWindows):
         if (DEBUG == 1):
-            printf(windowIndex[i], windowIndex[i]+CUT, windowBites[i])
+            print("{:.3f} {:.3f} {:.3f}".format(windowIndex[i], windowIndex[i]+CUT, windowBites[i]))
         else:
             if (int(windowBites[i]) > -1):
-                print("{d}".format(windowBites[i]), end='')  # class is number of bites
-                print("{:.3f}".format(float(windowBites[i])), end='')  # class is number of bites
+                if (PRINT_INT == True):
+                    #print('{d}'.format(windowBites[i]), end='')  # class is number of bites
+                    print(int(windowBites[i]), end='')
+                else:
+                    print("{:.3f}".format(float(floatWindowBites[i])), end='')  # class is number of bites
                 for k in range(int(windowIndex[i]), int(windowIndex[i] + CUT)):
                     if k < 0 or k >= totalData:
                         for j in range(0, DATA_FIELDS-1):
@@ -154,4 +158,4 @@ if (PRINT == 1):
                         for j in range(0, 6):
                             print("\t", "{:.3f}".format(
                                 SmoothedData[j][k]), end='')
-                print()
+                    print()
