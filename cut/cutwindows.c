@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
 FILE	*fpt;
 char	filename[320];
 int	i,j,k;
-float	zero[3],total;
+double	zero[3],total;
 //float	yaw,pitch,roll;
-float	*Data[7],*SmoothedData[7];
+double	*Data[7],*SmoothedData[7];
 int	TotalData;
 int	GTBiteIndex[MAX_BITES];		/* data index of GT bite */
 char	GTBiteHand[MAX_BITES][16];	/* left, right or both */
@@ -55,13 +55,13 @@ int STRIDE = atoi(argv[2]);
 
 for (i=0; i<7; i++)
   {
-  Data[i]=(float *)calloc(MAX_DATA,sizeof(float));
-  SmoothedData[i]=(float *)calloc(MAX_DATA,sizeof(float));
+  Data[i]=(double *)calloc(MAX_DATA,sizeof(double));
+  SmoothedData[i]=(double *)calloc(MAX_DATA,sizeof(double));
   }
 
-if ((fpt=fopen(argv[3],"r")) == NULL)
+if ((fpt=fopen(argv[3],"rb")) == NULL)
   {
-  printf("Unable to open %s for reading\n",argv[1]);
+  printf("Unable to open %s for reading\n",argv[3]);
   exit(0);
   }
 
@@ -72,7 +72,7 @@ TotalData=0;
 zero[0]=zero[1]=zero[2]=0.0; /* used to calculate avg of yaw pitch roll */
 while (1)
   {
-  i=fscanf(fpt,"%f %f %f  %f %f %f  %f",
+  i=fscanf(fpt,"%lf %lf %lf  %lf %lf %lf  %lf",
 	&(Data[0][TotalData]),&(Data[1][TotalData]),
 	&(Data[2][TotalData]),	/* x y z */
 	&(Data[3][TotalData]),&(Data[4][TotalData]),
