@@ -1,0 +1,5 @@
+Normalization
+	normalize with std dev based on what data?
+		-raw data - NO
+		-converted values
+		-smoothed values: Going with this since it is the values that will be z-scored
