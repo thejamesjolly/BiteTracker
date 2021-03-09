@@ -230,7 +230,7 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 
 
 		# Read and Parse current file
-		print("Reading {}".format(currFile))
+		#print("Reading {}".format(currFile))
 		[totalWindows,windowIndex,windowBites,totalData,SmoothedData] = ReadFileAndPrepWindows(
 			currFile,gt_filename,CUT,STRIDE,SMOOTHING)
 
@@ -252,7 +252,13 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 							currWindowData[k-int(windowIndex[i])][j] = SmoothedData[j][k] #Output actual data
 				
 
-				
+				#Print Point, Index, and File for validation
+				if (WindowCnt==0): #deterministically check first window of each batch
+					print('{} {}'.format(currFile,windowIndex[i]),end='')
+					print(currWindowData[1][:])
+
+
+
 				currWindowData.reshape([-1]) # Reshape the output to a single vector
 				# Normalize the Window
 				if (NORMALIZATION == 1): # Use Global Z Score
@@ -292,7 +298,7 @@ if __name__ == '__main__':
 		CUT = 75 # the total length of the window
 		STRIDE = 15 # The data samples to move across each window when making the windows
 		SMOOTHING_FACTOR = 7 # the number of data points to either side to smooth the raw data
-		WINDOWS_PER_BATCH = 5000 # the number of samples to pull from files
+		WINDOWS_PER_BATCH = 300 # the number of samples to pull from files
 		NORM_METHOD = 1 # The Normalization Function to call on the smoothed data in each window
 		DATABASE_FILE_NAMES = 'RelativeCafeDataFiles.txt' #Txt file containing the relative address of all database files
 	elif len(sys.argv) == NUM_INPUT_CONST: # User Specified Values
@@ -304,7 +310,7 @@ if __name__ == '__main__':
 		NORM_METHOD = int(sys.argv[6])
 
 	# # # # # # #  OTHER CONSTANTS  # # # # # # #
-	NUM_ITER = 5 # Number of iterations to call the generator
+	NUM_ITER = 10 # Number of iterations to call the generator
 
 	'''
 		Normalization Enumerations for NORM_METHOD variable:
