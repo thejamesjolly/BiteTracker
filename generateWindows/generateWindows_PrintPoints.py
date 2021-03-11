@@ -255,7 +255,7 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 				#Print Point, Index, and File for validation
 				if (WindowCnt==0): #deterministically check first window of each batch
 					print('{} {}'.format(currFile,windowIndex[i]),end='')
-					print(currWindowData[1][:])
+					print(currWindowData[0][:])
 
 
 
