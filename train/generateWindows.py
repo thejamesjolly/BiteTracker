@@ -186,11 +186,8 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 			SMOOTHING=7:
 			NORMALIZATION: 
 		Outputs:
-			totalWindows:
-			windowIndex:
-			windowBites:
-			totalData:
-			SmoothedData:
+			Classes:
+			OutputWindowData:
 	'''
 	
 
@@ -337,7 +334,8 @@ if __name__ == '__main__':
 
 	# # # # # # #  CODE SEGMENT  # # # # # # #
 	for i in range(0,NUM_ITER):
-		next(myGen)
+		[classes,data]=next(myGen)
+		print('classes 1 = {}'.format(classes[0]))
 		print('done with {}'.format(i))
 
 

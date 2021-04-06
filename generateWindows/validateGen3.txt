@@ -1,0 +1,14 @@
+Reading ../../BiteData/p005/c1/20120201113500388.txt
+../../BiteData/p005/c1/20120201113500388.txt [450.]<generator object generateWindowsFromRaw.<locals>.<genexpr> at 0x7fa0a302d360>
+done with 0
+../../BiteData/p005/c1/20120201113500388.txt [4950.]<generator object generateWindowsFromRaw.<locals>.<genexpr> at 0x7fa0a302d3b8>
+done with 1
+../../BiteData/p005/c1/20120201113500388.txt [9450.]<generator object generateWindowsFromRaw.<locals>.<genexpr> at 0x7fa0a302d410>
+Reading ../../BiteData/p005/c2/20120201115556861.txt
+done with 2
+../../BiteData/p005/c2/20120201115556861.txt [3510.]<generator object generateWindowsFromRaw.<locals>.<genexpr> at 0x7fa0a302d4c0>
+done with 3
+../../BiteData/p005/c2/20120201115556861.txt [8010.]<generator object generateWindowsFromRaw.<locals>.<genexpr> at 0x7fa0a302d518>
+Reading ../../BiteData/p006/c1/20120201113340476.txt
+done with 4
+Run Successful
