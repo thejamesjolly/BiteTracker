@@ -1,0 +1,15 @@
+./evalbites ./../../BiteData/p005/c1/gt_union.txt winbites/winbites_p005_c1.txt
+./evalbites ./../../BiteData/p005/c2/gt_union.txt winbites/winbites_p005_c2.txt
+./evalbites ./../../BiteData/p006/c1/gt_union.txt winbites/winbites_p006_c1.txt
+./evalbites ./../../BiteData/p068/c2/gt_union.txt winbites/winbites_p068_c2.txt
+./evalbites ./../../BiteData/p069/c1/gt_union.txt winbites/winbites_p069_c1.txt
+./evalbites ./../../BiteData/p069/c2/gt_union.txt winbites/winbites_p069_c2.txt
+./evalbites ./../../BiteData/p132/c1/gt_union.txt winbites/winbites_p132_c1.txt
+./evalbites ./../../BiteData/p132/c2/gt_union.txt winbites/winbites_p132_c2.txt
+./evalbites ./../../BiteData/p133/c1/gt_union.txt winbites/winbites_p133_c1.txt
+./evalbites ./../../BiteData/p199/c1/gt_union.txt winbites/winbites_p199_c1.txt
+./evalbites ./../../BiteData/p201/c1/gt_union.txt winbites/winbites_p201_c1.txt
+./evalbites ./../../BiteData/p202/c1/gt_union.txt winbites/winbites_p202_c1.txt
+./evalbites ./../../BiteData/p273/c1/gt_union.txt winbites/winbites_p273_c1.txt
+./evalbites ./../../BiteData/p273/c2/gt_union.txt winbites/winbites_p273_c2.txt
+./evalbites ./../../BiteData/p274/c1/gt_union.txt winbites/winbites_p274_c1.txt

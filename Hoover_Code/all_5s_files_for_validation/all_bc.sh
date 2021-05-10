@@ -534,4 +534,3 @@ echo "Through fourth fold of data..."
 echo "Through fifth fold of data..."
 
 echo "Finished with all bite counts."
-'

@@ -283,6 +283,70 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 	print(0)
 
 
+def generateBatchesForTF(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHING, NORMALIZATION = 0):
+		'''
+		Name: generateBatchesForTF
+		Inputs:
+			CUT=75:
+			STRIDE=15:
+			NUM_WINDOWS:
+			RAW_DATA_FILEPATHS:
+			SMOOTHING=7:
+			NORMALIZATION: 
+		Outputs:
+			batchData: a tuple containing the data as a numpy array, followed by a numpy array vector of classes
+	'''
+	# Initailize generator to make window 
+	batchGen = generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHING, NORMALIZATION)
+
+	# Define Variables 
+	total_axes=6
+	sample_length = CUT
+	num_samples=NUM_WINDOWS
+
+	# Begin infinite loop that will yield keras model format for a generator output {{x data},{y targets}}
+	while (True):
+		#Collect Data from Generator
+		[classes, data] = next(batchGen)
+
+		classes=np.array(classes)
+		data=np.array(data)
+
+		print("data has shape", data.shape)
+		print("classes has shape ", classes.shape)
+
+		# reshape data to flatten it to one row per recording
+		data_flat=data.reshape(len(classes),len(data[0])*total_axes)
+
+
+		print("data numpy reshaped")
+
+
+
+		print("data_flat has shape ", data_flat.shape)
+		np.set_printoptions(threshold=np.inf)
+		## print(data_flat[0])
+
+		data_input=np.zeros((len(data_flat),sample_length,total_axes))
+		for a in range(0,num_samples):
+			for b in range(0,sample_length):
+				for c in range(0,total_axes):
+					data_input[a][b][c]=data_flat[a][c*sample_length+b]
+		
+
+		# Format for batch training as {data, classes} tuple
+		batchData = {data_input,classes}
+
+		yield batchData
+
+		#End of While(True) loop
+
+	print ("Generator Ended")
+
+
+
+
+
 
 if __name__ == '__main__':
 

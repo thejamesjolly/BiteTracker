@@ -1,8 +1,32 @@
-usage: bc [options] [file ...]
-  -h  --help         print this usage and exit
-  -i  --interactive  force interactive mode
-  -l  --mathlib      use the predefined math routines
-  -q  --quiet        don't print initial banner
-  -s  --standard     non-standard bc constructs are errors
-  -w  --warn         warn about non-standard bc constructs
-  -v  --version      print version information and exit
+1913
+2153
+2363
+2648
+2888
+3098
+3263
+3563
+3803
+3938
+4043
+4238
+4418
+4598
+4808
+5063
+5273
+5378
+5543
+5678
+5858
+5963
+6128
+6398
+6593
+6743
+6923
+7103
+7283
+7463
+7688
+7838

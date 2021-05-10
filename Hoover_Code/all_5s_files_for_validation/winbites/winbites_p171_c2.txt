@@ -1,1 +1,8 @@
-input layer name conv1d_1_input not found
+812
+1007
+1217
+1442
+1742
+1997
+2282
+2672
