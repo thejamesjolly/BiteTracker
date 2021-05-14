@@ -20,9 +20,6 @@ def Normalize_Global_ZScore(WindowData):
 	StdDevGlobal = np.array([0.42497707,0.31433277,0.37317531,11.24464988,10.9460381,21.43543905])
 	MeansGlobal = np.array([0.56744746,-0.28966115,0.60622525,-0.0008205,-0.00089252,-0.0005668])
 
-	# Save original shape for return
-	OrigShape = WindowData.shape
-
 	# Reshape for easy indexing
 	WindowDataMat = np.reshape(WindowData,[-1,6])
 
@@ -32,40 +29,13 @@ def Normalize_Global_ZScore(WindowData):
 		for b in range(0,6):
 			NormMat[a][b] = (WindowDataMat[a][b]/MeansGlobal[b])/StdDevGlobal[b] # Zscore=(value-mean)/StdDev
 
-	#convert back into a Original Shape matrix
-	NormVector = np.reshape(NormMat,OrigShape)
+	#convert back into a 1D vector
+	NormVector = np.reshape(NormMat,[-1])
 
 	return(NormVector)
 
 
-def Normalize_MinMax(WindowData):
-	'''
-	Name: Normalize_MinMax()
-	Inputs: WindowData: 1D Array of data from a window
-	 	consisting of some multiple of 6 measurements, lists in order of
-			[x_accel, y_accel, z_accel, yaw, pitch, roll]
-	Outputs: 1D Array of data adjusted to the means and StdDev defined from a
-		previous parsing of all data (Run in Jan 2021)
-	'''
 
-	# Save original shape for return
-	OrigShape = WindowData.shape
-	
-	# Reshape for easy indexing
-	WindowDataMat = np.reshape(WindowData,[-1,6])
-
-
-	NormMat = np.zeros(np.shape(WindowDataMat)) #Preallocate space
-	for b in range(0,6):
-		s=min(WindowDataMat[:][b])
-		t = max(WindowDataMat[:][b])
-		NormMat[:][b] = ((WindowDataMat[:][b]) - s)/(t-s)
-
-	#convert back into a Original Shape matrix
-	NormVector = np.reshape(NormMat,OrigShape)
-
-
-	return(NormVector)
 
 
 def ReadFileAndPrepWindows(Filepath_Data,Filepath_gt_union,CUT=75,STRIDE=15,SMOOTHING=7):
@@ -105,13 +75,16 @@ def ReadFileAndPrepWindows(Filepath_Data,Filepath_gt_union,CUT=75,STRIDE=15,SMOO
 	# ** yaw pitch roll (gyro units are volts) scale (units are grams) */
 	zero = np.zeros(shape=(3, 1))
 
+	# //scan and throw away header information
 	fpt = open(Filepath_Data, 'r')
-	Data=np.array([[float(x) for x in line.split()] for line in fpt])
-	Data = np.transpose(Data)
-	for j in range(0, 3):
-		zero[j] = np.sum(Data[j+3][:])
-	totalData = len(Data[0])
-
+	for line in fpt:
+		if line == "\n":
+			#print("File Has Duplicate Ending")
+			continue
+		Data[0][totalData],Data[1][totalData],Data[2][totalData],Data[3][totalData],Data[4][totalData],Data[5][totalData],Data[6][totalData] = line.split()
+		for j in range(0, 3):
+			zero[j] += Data[j+3][totalData]
+		totalData += 1
 
 	for j in range(0, 3):
 		zero[j] /= totalData
@@ -148,13 +121,17 @@ def ReadFileAndPrepWindows(Filepath_Data,Filepath_gt_union,CUT=75,STRIDE=15,SMOO
 
 	# //load bites.txt
 	fpt = open(Filepath_gt_union, 'r')
-	GT_Data = [line.split() for line in fpt]
+	# //allocate space for ground truth data
+	GTbiteIndex = np.zeros(shape=(MAX_BITES, 1))
+	# //read bite ground truth file
+	totalBites = 0
+	for line in fpt:
+		if (line.strip() == ""):
+			#print("Gt_union.txt File Has Empty Ending")
+			continue
+		trash, GTbiteIndex[totalBites], trash,trash,trash,trash = line.split()
+		totalBites += 1
 	fpt.close()
-
-	totalBites = len(GT_Data)
-	GTbiteIndex = np.zeros(shape=(totalBites, 1))
-	for a in range(0,totalBites):
-		GTbiteIndex[a] = float(GT_Data[a][1])
 
 	# cut windows CUT sec prior to first bite, to CUT sec after last bite */
 	start = GTbiteIndex[0]-CUT
@@ -214,7 +191,7 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 	'''
 	
 
-	Max_Norm_Option = 2 # if higher than this int, the normalization option is not specified and no normalization will be done
+	Max_Norm_Option = 1 # if higher than this int, the normalization option is not specified and no normalization will be done
 
 	Classes = []
 	OutputWindowData = []
@@ -240,7 +217,7 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 	while (True):
 		currFileNum += 1
 		if (currFileNum >= TotalFiles): # if one read all files, return to start and read again 
-			#print("Total Windows Before Looping back to beginning: {}".format(WindowCnt))
+			print("Total Windows Before Looping back to beginning: {}".format(WindowCnt))
 			currFileNum = 0
 
 		currFile = AllDataFiles[currFileNum]
@@ -283,12 +260,10 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 
 
 				
-				#currWindowData.reshape([-1]) # Reshape the output to a single vector
+				currWindowData.reshape([-1]) # Reshape the output to a single vector
 				# Normalize the Window
 				if (NORMALIZATION == 1): # Use Global Z Score
 					currWindowData = Normalize_Global_ZScore(currWindowData)
-				elif (NORMALIZATION == 2): # Use MinMax Normalization
-					currWindowData = Normalize_MinMax(currWindowData)
 				#else: #if (NORMALIZATION == 0) or if not specified accurately
 					# else statement taken out because no work is done if not normalizing
 
@@ -299,7 +274,7 @@ def generateWindowsFromRaw(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHI
 
 				# Yield Results if desired batch size is met
 				if WindowCnt >= NUM_WINDOWS:
-					#print("FileNumber Upon Yielding: {}".format(currFileNum))
+					print("FileNumber Upon Yielding: {}".format(currFileNum))
 					yield [Classes,OutputWindowData]
 					#Upon return, reset all outputs and counters
 					WindowCnt = 0
@@ -338,7 +313,23 @@ def generateBatchesForTF(CUT, STRIDE, NUM_WINDOWS, RAW_DATA_FILEPATHS, SMOOTHING
 		[classes, data] = next(batchGen)
 
 		classes=np.array(classes)
-		data_input=np.array(data)
+		data=np.array(data)
+
+		#print("data has shape", data.shape)
+		#print("classes has shape ", classes.shape)
+        
+		data_flat = data
+
+		#print("data_flat has shape ", data_flat.shape)
+		np.set_printoptions(threshold=np.inf)
+		## print(data_flat[0])
+
+		data_input=np.zeros((len(data_flat),sample_length,total_axes))
+		for a in range(0,num_samples):
+			for b in range(0,sample_length):
+				for c in range(0,total_axes):
+					data_input[a][b][c]=data_flat[a][c*sample_length+b]
+		
 
 		# Format for batch training as {data, classes} tuple
 		batchData = (data_input,classes)

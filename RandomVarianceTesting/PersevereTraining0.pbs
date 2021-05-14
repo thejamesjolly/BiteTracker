@@ -1,0 +1,11 @@
+#PBS -N 15test0
+#PBS -l select=1:ncpus=2:mem=16gb:interconnect=any:ngpus=1:gpu_model=any,walltime=48:00:00
+#PBS -o logs/output0.txt
+#PBS -e logs/error0.txt
+
+
+cd ~/BiteCounter/Code/HooverCodeTest
+
+source activate tf_RCF_env
+
+./PersevereToArg1_py.sh Full0

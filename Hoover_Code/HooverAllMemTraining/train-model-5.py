@@ -74,6 +74,8 @@ print("data separation ",end-start," seconds")
 start=time.time()
 
 normdata=np.empty_like(data)
+
+
 for a in range(0,len(data)):
   norm=[]
   s=min(data[a])

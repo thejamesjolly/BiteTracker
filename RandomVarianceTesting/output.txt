@@ -1,0 +1,17 @@
+python train-model.py MyLocation/models/Cut75_Str15_fold1 75 15 FoldData/DataFiles_fold1.txt > MyLocation/Cut75_Str15_fold1.txt
+ 
+ 
++------------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES REQUESTED | 
++------------------------------------------+ 
+ 
+mem=10gb,walltime=48:00:00,ncpus=2
+ 
+ 
++-------------------------------------+ 
+| PALMETTO CLUSTER PBS RESOURCES USED | 
++-------------------------------------+ 
+ 
+cput=00:00:01,mem=15916kb,walltime=00:00:01,ncpus=2,cpupercent=0,vmem=15916kb
+ 
+ 
