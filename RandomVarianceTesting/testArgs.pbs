@@ -9,8 +9,3 @@ cd ~/BiteCounter/Code/RandomVarianceTesting
 echo "python train-model.py "$OutputFolder"/models/Cut"$Cut"_Str"$Stride"_fold"$Fold" "$Cut" "$Stride" FoldData/DataFiles_fold1.txt > "$OutputFolder"/Cut"$Cut"_Str"$Stride"_fold"$Fold".txt"
 
 
-
-
-
-
-

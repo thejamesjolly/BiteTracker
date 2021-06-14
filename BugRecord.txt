@@ -1,0 +1,11 @@
+Date
+	Bug found
+
+May 26th, 2021 
+	Code was not training on variety of window size based on input argument.  
+	Instead was printing argument but using a hardcoded value of just 5 sec window size
+
+May 30th, 2021
+	Realized in PersevStepA.sh, the only data for training was fold 1 since the input file was hardcoded.
+
+

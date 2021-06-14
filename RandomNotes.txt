@@ -3,3 +3,14 @@ Normalization
 		-raw data - NO
 		-converted values
 		-smoothed values: Going with this since it is the values that will be z-scored
+
+Need to remove padding with zeros at beginning and end of data 
+
+
+3 tasks for doing in parallel
+	-Better random by blending files in generatorWindowsShuffle (make a variable, say blend 5 files worth of windows to iterate through)
+		-Do so by making a non-random NP array of random subset of files, then shuffling
+	-Make the C Non-Shuffle have large (320+) batch size to see if that eases the difference of original to non-shuffle 32 batch size
+	-Run large Original C code to with large memory reserves on Palmetto
+		-But also increase the stride to decrease memory limit since much of the internal window would be the same
+			-Based on Calhoun's advice that the single datum stride would be dumb since it is 99% similar to the previous window 
