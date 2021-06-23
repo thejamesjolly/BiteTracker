@@ -14,3 +14,11 @@ Need to remove padding with zeros at beginning and end of data
 	-Run large Original C code to with large memory reserves on Palmetto
 		-But also increase the stride to decrease memory limit since much of the internal window would be the same
 			-Based on Calhoun's advice that the single datum stride would be dumb since it is 99% similar to the previous window 
+
+
+In Random mix of files, find faster way then appending a window at a time (return 32 at a time if possible)
+
+
+Questions for Hoover
+	-Why Kernel Size and number of filters?
+	-Softmax pooling option from krystisis paper?
