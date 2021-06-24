@@ -1,17 +1,23 @@
-
 import sys
 import numpy as np
 
-
+import random
 
 
 if __name__ == '__main__':
-
+	
+	# CONSTANTS
+	DEBUG_PRINT_FLAG = 0
+	
 	# Variables
 	cut=10 # number of elements to include in a Window
 	stride=1
 	eventLocations10 = [11, 16, 30, 32, 37, 50, 53, 55, 63] # indexes of events
 	#eventLocations10=[11, 16, 21, 26, 31, 39, 42]
+	eventLocationsRnd=[]
+	eventLocationsRnd.append(cut+1) # place first item outside of first window
+	for i in range(1,10):
+		eventLocationsRnd.append(eventLocationsRnd[i-1]+random.randint(2,cut*1.5))
 
 
 
@@ -19,8 +25,9 @@ if __name__ == '__main__':
 
 
 	# Execute "Predictions" based on the Event Locations
-	eventLocs=eventLocations10
-	totalEvents=len(eventLocations10)
+	eventLocs=eventLocationsRnd
+
+	totalEvents=len(eventLocs)
 	j=0 # Prediction Index
 	preds=[]
 	for i in range(0,max(eventLocs)+cut+stride,stride):
@@ -50,9 +57,15 @@ if __name__ == '__main__':
 	predEventsAtLastTrigger=1 #starts at 1 since entering a non-event space will only happed after last event takes a single spot
 	windowCursor=0 # floats up and back 
 	expectedCount=np.zeros(len(preds))
+	expectedWindow=[1]*cut
+	stepScaledRunSum=0
+
+	if DEBUG_PRINT_FLAG==1:
+		print("{:6s} {:6s} {:6s} {:6s}".format("Index","Preds","WinCsr","ExpWnd"))
+
 
 	for i in range(1,len(preds)):
-		scaledRunSum+=round((preds[i])*(float(stride)/float(cut)),1)
+		scaledRunSum+=(preds[i])*(float(stride)/float(cut))
 		if False: #Naive Beginning of window
 			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
 				prevInt+=1
@@ -167,14 +180,71 @@ if __name__ == '__main__':
 				prevInt+=1
 				predEventsAtLastTrigger = preds[i]
 
-		elif True: #ignore Running sum and use the start of a bite and it's expected end
+		elif False: #ignore Running sum and use the start of a bite and it's expected end
 			
 			if expectedCount[i] < preds[i]:
 				guessLocs.append(i*stride+cut-1) # location of event just came in range
 
 				#update expected values for next locations in CUT
 				for j in range(cut):
-					expectedCount[i+j] += 1 
+					expectedCount[i+j] += 1
+
+		elif True: #ignore Running sum and use the start of a bite and it's expected end
+
+			if (scaledRunSum >= prevInt+0.999+(float(stride)/cut)): #if there is extra to reach index
+				
+				stepScaledRunSum = scaledRunSum-(preds[i])*(float(stride)/float(cut))
+				
+				numEventsForTrigger=0
+				while(stepScaledRunSum < prevInt+0.999):
+					stepScaledRunSum += (float(stride)/float(cut))
+					numEventsForTrigger+=1
+
+				if numEventsForTrigger != expectedWindow[0]:
+					windowCursor += numEventsForTrigger-expectedWindow[0] # move cursor forward by however many additional events are in window
+				#if numEventsForTrigger > expectedWindow[0]:
+				#	windowCursor += numEventsForTrigger-expectedWindow[0] # move cursor forward by however many additional events are in window
+
+				guessLocs.append(i*stride+windowCursor)
+				print("SpillOver Location")
+				prevInt+=1
+
+				#if the event will contribute to expected counts, update expected
+				if windowCursor != 0: 
+					for j in range(windowCursor+1):
+						expectedWindow[j]+=1
+				windowCursor=0 #reset for next event
+
+				if (preds[i]-numEventsForTrigger) > expectedWindow[0]: #check if remaining events are above expected
+					windowCursor += preds[i]-numEventsForTrigger-expectedWindow[0] # move cursor forward by however many additional events are in window
+
+			elif (scaledRunSum >= prevInt+0.999): #If just met index # don't use "+1" due to float precision
+				
+				if preds[i] > expectedWindow[0]:
+					windowCursor += preds[i]-expectedWindow[0] # move cursor forward by however many additional events are in window
+				
+				print("Exact Location")
+				guessLocs.append(i*stride+windowCursor)
+				#guessLocs.append(i*stride+windowCursor+expectedWindow[0]-1)
+				prevInt+=1
+
+				#if the event will contribute to expected counts, update expected
+				if windowCursor != 0: 
+					for j in range(windowCursor+1):
+						expectedWindow[j]+=1
+				windowCursor=0 #reset for next event
+			
+			else:
+				if preds[i] > expectedWindow[0]:
+					windowCursor += preds[i]-expectedWindow[0] # move cursor forward by however many additional events are in window
+
+			expectedWindow=expectedWindow[1:]
+			expectedWindow.append(1)
+			#print(expectedWindow)
+			
+		if DEBUG_PRINT_FLAG==1:
+			print("{:5.0f}  {:5.0f}  {:5.0f}  {}".format(i,preds[i],windowCursor,expectedWindow))
+
 
 
 
@@ -185,18 +255,22 @@ if __name__ == '__main__':
 
 
 	#print(scaledRunSum)
-	
+	maxDiff=0
 	print("{:8s}{:8s}".format("Prediction","Actual"))
 	for i in range(len(eventLocs)):
 		print("{:5.0f}   {:5.0f}".format(guessLocs[i],eventLocs[i]))
+		if abs(guessLocs[i]-eventLocs[i]) > maxDiff:
+			maxDiff=guessLocs[i]-eventLocs[i]
 
 
-	print(windowCursor)
-	if True:
+	print("MaxDifference = ",maxDiff)
+	
+	print(sum(preds))
+	if False:
 		for i in range(len(preds)):
 			print("{:5.0f}  {:5.0f}".format(i,preds[i]))
-	if False:
-		print(preds)
+	if True:
+		print("Preds=",preds)
 
 
 	print('Program SampleAlgorithm.py Finished.')
