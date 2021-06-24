@@ -51,10 +51,6 @@ if __name__ == '__main__':
 	scaledRunSum=0.0
 	prevInt=0
 
-	minEventsSinceTrigger=1
-	maxEventsSinceTrigger=1
-	maxEventsSinceZero=1
-	predEventsAtLastTrigger=1 #starts at 1 since entering a non-event space will only happed after last event takes a single spot
 	windowCursor=0 # floats up and back 
 	expectedCount=np.zeros(len(preds))
 	expectedWindow=[1]*cut
@@ -70,115 +66,6 @@ if __name__ == '__main__':
 			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
 				prevInt+=1
 				guessLocs.append(i*stride)
-		elif False: # Shift offset forward for every point above lowest prediciton
-
-			if preds[i] > predEventsAtLastTrigger:
-				windowCursor += preds[i]-predEventsAtLastTrigger # move cursor forward by however many additional events are in window
-				print("preds[i] = ",preds[i]," and predEventLast = ",predEventsAtLastTrigger)
-				print("1windowCursor now ", windowCursor," at index ",i)
-			elif preds[i] != 0 and preds[i] < predEventsAtLastTrigger:
-				windowCursor -= predEventsAtLastTrigger - preds[i]
-				print("preds[i] = ",preds[i]," and predEventLast = ",predEventsAtLastTrigger)
-				print("2windowCursor now ", windowCursor," at index ",i)
-			
-			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
-				guessLocs.append(i*stride+windowCursor)
-				prevInt+=1
-				predEventsAtLastTrigger=preds[i]#ADD CODE FOR OFFSET
-				
-
-		elif False: # Shift offset forward for every point above lowest prediciton
-			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
-				guessLocs.append(i*stride+windowCursor)
-				minEventsSinceTrigger = preds[i]
-				prevInt+=1
-				predEventsAtLastTrigger = preds[i] 
-				windowCursor=0
-				
-			if preds[i] != 0 and preds[i] < minEventsSinceTrigger:
-				minEventsSinceTrigger = preds[i]
-
-			if preds[i] > minEventsSinceTrigger:
-				windowCursor += preds[i]-minEventsSinceTrigger # move cursor forward by however many additional events are in window
-				print("preds[i] = ",preds[i]," and minEventsSinceTrigger = ",minEventsSinceTrigger)
-				print("1windowCursor now ", windowCursor," at index ",i)
-			elif preds[i] != 0 and preds[i] < minEventsSinceTrigger:
-				windowCursor -= minEventsSinceTrigger - preds[i]
-				print("preds[i] = ",preds[i]," and minEventsSinceTrigger = ",minEventsSinceTrigger)
-				print("2windowCursor now ", windowCursor," at index ",i)
-
-		elif False: # Try Splitting the situastion where a trigger takes place perfectly on a predication
-			if (scaledRunSum >= prevInt+0.999+0.1):
-				minEventsSinceTrigger = preds[i]
-				predEventsAtLastTrigger = preds[i] 
-
-				
-			if preds[i] != 0 and preds[i] < minEventsSinceTrigger:
-				minEventsSinceTrigger = preds[i]
-
-			if preds[i] > minEventsSinceTrigger:
-				windowCursor += preds[i]-minEventsSinceTrigger # move cursor forward by however many additional events are in window
-				print("preds[i] = ",preds[i]," and minEventsSinceTrigger = ",minEventsSinceTrigger)
-				print("1windowCursor now ", windowCursor," at index ",i)
-			elif preds[i] != 0 and preds[i] < minEventsSinceTrigger:
-				windowCursor -= minEventsSinceTrigger - preds[i]
-				print("preds[i] = ",preds[i]," and minEventsSinceTrigger = ",minEventsSinceTrigger)
-				print("2windowCursor now ", windowCursor," at index ",i)
-
-			if ((scaledRunSum >= prevInt+0.999) and (scaledRunSum < prevInt+0.999+0.1)):
-				minEventsSinceTrigger = preds[i]
-				predEventsAtLastTrigger = preds[i] 
-
-			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
-				guessLocs.append(i*stride+windowCursor)
-				prevInt+=1
-				windowCursor=0
-				
-		elif False: # Shift offset forward for every point above lowest prediciton
-			
-			if preds[i]==0:
-				windowCursor=0
-			if preds[i] != 0 and preds[i] > maxEventsSinceTrigger:
-				maxEventsSinceTrigger = preds[i]
-
-			if preds[i] > 1:
-				windowCursor += preds[i]-1 # move cursor forward by however many additional events are in window
-				print("preds[i] = ",preds[i])
-				print("1windowCursor now ", windowCursor," at index ",i)
-			elif preds[i] != 0 and preds[i] < maxEventsSinceTrigger:
-				windowCursor -= maxEventsSinceTrigger - preds[i]
-				print("preds[i] = ",preds[i]," and maxEventsSinceTrigger = ",maxEventsSinceTrigger)
-				print("2windowCursor now ", windowCursor," at index ",i)
-			
-			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
-				guessLocs.append(i*stride+windowCursor)
-				maxEventsSinceTrigger = preds[i]
-				prevInt+=1
-				predEventsAtLastTrigger = preds[i]
-				windowCursor=0
-
-		elif False: 
-			
-			if preds[i]==0:
-				windowCursor=0
-				maxEventsSinceZero=1
-			if preds[i] != 0 and preds[i] > maxEventsSinceZero:
-				maxEventsSinceZero = preds[i]
-
-			if preds[i] > 1:
-				windowCursor += preds[i]-1 # move cursor forward by however many additional events are in window
-				print("preds[i] = ",preds[i])
-				print("1windowCursor now ", windowCursor," at index ",i)
-			elif preds[i] != 0 and preds[i] < maxEventsSinceZero:
-				windowCursor -= maxEventsSinceZero - preds[i]
-				print("preds[i] = ",preds[i]," and maxEventsSinceZero = ",maxEventsSinceZero)
-				print("2windowCursor now ", windowCursor," at index ",i)
-			
-			if (scaledRunSum >= prevInt+0.999): # don't use "+1" due to float precision
-				guessLocs.append(i*stride+windowCursor)
-				maxEventsSinceZero = preds[i]
-				prevInt+=1
-				predEventsAtLastTrigger = preds[i]
 
 		elif False: #ignore Running sum and use the start of a bite and it's expected end
 			
