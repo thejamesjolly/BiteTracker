@@ -1,5 +1,5 @@
 import sys
-import numpy as np
+#import numpy as np
 
 import random
 
@@ -7,17 +7,18 @@ import random
 if __name__ == '__main__':
 	
 	# CONSTANTS
-	DEBUG_PRINT_FLAG = 0
+	DEBUG_PRINT_FLAG = 1
 	
 	# Variables
 	cut=10 # number of elements to include in a Window
 	stride=1
 	eventLocations10 = [11, 16, 30, 32, 37, 50, 53, 55, 63] # indexes of events
 	#eventLocations10=[11, 16, 21, 26, 31, 39, 42]
+	eventLocations10 = [11,12,15,26,32,33,34,46,48,58] # indexes of events
 	eventLocationsRnd=[]
 	eventLocationsRnd.append(cut+1) # place first item outside of first window
 	for i in range(1,10):
-		eventLocationsRnd.append(eventLocationsRnd[i-1]+random.randint(2,cut*1.5))
+		eventLocationsRnd.append(eventLocationsRnd[i-1]+random.randint(1,cut*1.5))
 
 
 
@@ -102,8 +103,8 @@ if __name__ == '__main__':
 						expectedWindow[j]+=1
 				windowCursor=0 #reset for next event
 
-				if (preds[i]-numEventsForTrigger) > expectedWindow[0]: #check if remaining events are above expected
-					windowCursor += preds[i]-numEventsForTrigger-expectedWindow[0] # move cursor forward by however many additional events are in window
+				if (preds[i]) > expectedWindow[0]: #check if remaining events are above expected
+					windowCursor += preds[i]-expectedWindow[0] # move cursor forward by however many additional events are in window
 
 			elif (scaledRunSum >= prevInt+0.999): #If just met index # don't use "+1" due to float precision
 				
@@ -124,13 +125,13 @@ if __name__ == '__main__':
 			else:
 				if preds[i] > expectedWindow[0]:
 					windowCursor += preds[i]-expectedWindow[0] # move cursor forward by however many additional events are in window
-
+			
+			if DEBUG_PRINT_FLAG==1:
+				print("{:5.0f}  {:5.0f}  {:5.0f}  {}".format(i,preds[i],windowCursor,expectedWindow))
 			expectedWindow=expectedWindow[1:]
 			expectedWindow.append(1)
 			#print(expectedWindow)
 			
-		if DEBUG_PRINT_FLAG==1:
-			print("{:5.0f}  {:5.0f}  {:5.0f}  {}".format(i,preds[i],windowCursor,expectedWindow))
 
 
 
