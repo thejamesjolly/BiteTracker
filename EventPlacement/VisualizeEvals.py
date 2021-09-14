@@ -9,6 +9,7 @@ course of ground truth times
 
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Flags
 EXTENDED_MATH_OUTPUT = 1
@@ -18,24 +19,17 @@ EXTENDED_MATH_OUTPUT = 1
 
 MAX_RANGE_CONSIDERED=15*10 
 	# if outside this range from first and last gt, bite doesn't matter
-MAX_BITES=1000
+MAX_BITES=100
 NOT_MATCHED=-99999 #sentinel used during matching
 NOT_COUNTED=-99998 # bite outside evaluated range
 
+NUM_PRED_FILES=len(sys.argv)-2 # all files after executable and gt are predictions
 
 
-total_gt_bites = 0
-gt_bite_indices=np.zeros((MAX_BITES,1))
-total_comp_bites = 0
-comp_bite_indices=np.zeros((MAX_BITES,1))
-
-gt_matched=np.zeros((MAX_BITES,1))
-comp_matched=np.zeros((MAX_BITES,1))
-
-comp_sec=0
-gt_sec=0
-early_sec=0
-
+total_gt_bites = np.zeros((NUM_PRED_FILES,1))
+gt_bite_indices=np.zeros((NUM_PRED_FILES,MAX_BITES))
+total_comp_bites = np.zeros((NUM_PRED_FILES,1))
+comp_bite_indices=np.zeros((NUM_PRED_FILES,MAX_BITES))
 
 
 
@@ -49,11 +43,6 @@ if len(sys.argv) < 3:
 
 
 
-
-
-
-
-
 #Read Ground Truth
 fpt = open(sys.argv[1], 'r')
 #format is gt is: [bite number#] [index#] [hand] [utensil] [location] [food]
@@ -62,92 +51,42 @@ total_gt_bites=len(gt_bite_indices)
 
 
 
-#Read Pred Times
-fpt = open(sys.argv[2], 'r')
-#format is pred is: [index#]
-comp_bite_indices=([int(line.split()[0]) for line in fpt])
 
-#remove predictions outside the window
-while (comp_bite_indices[0]<gt_bite_indices[0] - MAX_RANGE_CONSIDERED & len(comp_bite_indices)>=1):
-	comp_bite_indices.pop(0)
-while (comp_bite_indices[-1]>gt_bite_indices[-1] + MAX_RANGE_CONSIDERED & len(comp_bite_indices)>=1):
-	comp_bite_indices.pop(-1)
+for i in range(NUM_PRED_FILES):
 
-total_comp_bites=len(comp_bite_indices)
+	#Read Pred Times
+	fpt = open(sys.argv[2], 'r')
+	#format is pred is: [index#]
+	temp=([int(line.split()[0]) for line in fpt])
+	comp_bite_indices[i,0:len(temp)]=temp[0:len(temp)]
+	fpt.close()
 
 
-
-#initialize all comp<->gt matches
-
-for i in range(total_gt_bites):
-	gt_matched[i] = NOT_MATCHED
-for i in range(total_comp_bites):
-	comp_matched[i] = NOT_MATCHED
-
-if (len(sys.argv)==5):
-	for i in range(total_gt_bites):
-		if gt_bite_indices[i] < int(sys.argv[3]) or gt_bite_indices[i] > int(sys.argv[4]):
-			gt_bite_indices[i] = NOT_COUNTED
-	for i in range(total_comp_bites):
-		if comp_bite_indices[i] < int(sys.argv[3]) or comp_bite_indices[i] > int(sys.argv[4]):
-			comp_bite_indices[i] = NOT_COUNTED
+	total_comp_bites[i]=len(temp)
 
 
-# Find Matches from comp<->gt
+# Plotting
+plot_colors=['r','b','g','k','m','t']
+num_colors=len(plot_colors)
+dot_graphics=['o','^','d','V','*']
+num_dots=len(dot_graphics)
 
-for i in range(total_comp_bites):
-	# find first GT bite that is not yet matched but occurs
-	# 	after the previous computer detected bite
-	for j in range(total_gt_bites):
-		if gt_matched[j]==NOT_MATCHED and (i==0 or gt_bite_indices[j]>comp_bite_indices[i-1]):
-			break
-	if j==total_gt_bites:
-		continue # no GT bite can possibly match
-	#check that GT bite does not occur before the next comp detection
-	if (i==total_comp_bites-1 or gt_bite_indices[j] < comp_bite_indices[i+1]):
-		#match bites if the check passes
-		comp_matched[i]=gt_bite_indices[j]
-		gt_matched[j]=comp_bite_indices[i]
-
-
-	
-
-#Count up TP, FP, and U; also calc mean and stddev
-
-TP=0
-FP=0
-U=0
-mean_time_diff=0.0
-
-for i in range(total_gt_bites):
-	if gt_matched[i] != NOT_MATCHED and gt_matched[i] != NOT_COUNTED:
-		TP+=1
-		if EXTENDED_MATH_OUTPUT==1:
-			mean_time_diff+=abs(gt_matched[i]-gt_bite_indices[i])
-
-	elif (gt_matched[i] != NOT_COUNTED):
-		U+=1
-
-if EXTENDED_MATH_OUTPUT==1:
-	stddev_time_diff=0.0
-	if TP>0:
-		mean_time_diff/=TP
-		for i in range(total_gt_bites):
-			if gt_matched[i] != NOT_MATCHED and gt_matched[i] != NOT_COUNTED:
-				stddev_time_diff+=np.square(abs(gt_matched[i]-gt_bite_indices[i])-mean_time_diff)
-		stddev_time_diff=int(np.sqrt(float(stddev_time_diff))/float(TP-1))
-
-for i in range(total_comp_bites):
-	if comp_matched[i]==NOT_MATCHED:
-		FP+=1
-
-if EXTENDED_MATH_OUTPUT==1:
-	print("TP={} FP={} U={}".format(TP, FP, U))
-	print("mean_TP_diff={}  stddev={}".format(mean_time_diff,stddev_time_diff))
-else:
-	print("{}  {}  {}".format(TP,FP,U))
+plt.figure(1)
 
 
 
-print(gt_bite_indices)
-print(comp_bite_indices)
+for i in range(NUM_PRED_FILES):
+	#plot
+	x=comp_bite_indices[i,0:int(total_comp_bites[i])]
+	y=np.ones((int(total_comp_bites[i]),1))*i
+
+	# Cycle through dot and color combos
+	plt.plot(x,y,plot_colors[i%num_colors]+dot_graphics[i%num_dots])
+
+
+#Add Ground Truth at top
+x=gt_bite_indices[0:int(total_gt_bites)]
+y=np.ones((int(total_gt_bites),1))*NUM_PRED_FILES
+plt.plot(x,y,'kd')
+
+plt.savefig('test.png')
